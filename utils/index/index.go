@@ -7,7 +7,7 @@ import (
 
 // A thread safe wrapper for the github.com/google/btree implementation
 type Index struct {
-	mutex sync.RWMutex
+	sync.RWMutex
 	tree  *btree.BTree
 }
 
@@ -40,50 +40,50 @@ func New(index int) *Index {
 }
 
 func (i *Index) ReplaceOrInsert(item IdxItem) IdxItem {
-	i.mutex.Lock()
-	defer i.mutex.Unlock()
+	i.Lock()
+	defer i.Unlock()
 	return i.tree.ReplaceOrInsert(item)
 }
 
 func (i *Index) Get(key IdxItem) IdxItem {
-	i.mutex.RLock()
-	defer i.mutex.RUnlock()
+	i.RLock()
+	defer i.RUnlock()
 	return i.tree.Get(key)
 }
 
 func (i *Index) Has(key IdxItem) bool {
-	i.mutex.RLock()
-	defer i.mutex.RUnlock()
+	i.RLock()
+	defer i.RUnlock()
 	return i.tree.Has(key)
 }
 
 func (i *Index) Delete(item IdxItem) IdxItem {
-	i.mutex.Lock()
-	defer i.mutex.Unlock()
+	i.Lock()
+	defer i.Unlock()
 	return i.tree.Delete(item)
 }
 
 func (i *Index) Len() int {
-	i.mutex.RLock()
-	defer i.mutex.RUnlock()
+	i.RLock()
+	defer i.RUnlock()
 	return i.tree.Len()
 }
 
 func (i *Index) Max() IdxItem {
-	i.mutex.RLock()
-	defer i.mutex.RUnlock()
+	i.RLock()
+	defer i.RUnlock()
 	return i.tree.Max()
 }
 
 func (i *Index) Min() IdxItem {
-	i.mutex.RLock()
-	defer i.mutex.RUnlock()
+	i.RLock()
+	defer i.RUnlock()
 	return i.tree.Min()
 }
 
 func (i *Index) AllAsc() IdxItemList {
-	i.mutex.RLock()
-	defer i.mutex.RUnlock()
+	i.RLock()
+	defer i.RUnlock()
 	all := make([]IdxItem,0, i.tree.Len())
 	i.tree.Ascend(func(a btree.Item) bool {
 		all = append(all, a)
@@ -93,8 +93,8 @@ func (i *Index) AllAsc() IdxItemList {
 }
 
 func (i *Index) AllDesc() IdxItemList {
-	i.mutex.RLock()
-	defer i.mutex.RUnlock()
+	i.RLock()
+	defer i.RUnlock()
 	all := make([]IdxItem,0, i.tree.Len())
 	i.tree.Descend(func(a btree.Item) bool {
 		all = append(all, a)
@@ -102,6 +102,3 @@ func (i *Index) AllDesc() IdxItemList {
 	})
 	return all
 }
-
-
-
