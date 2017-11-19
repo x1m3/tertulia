@@ -2,18 +2,17 @@ package model
 
 import "testing"
 import (
-	"github.com/nu7hatch/gouuid"
 	"time"
 )
 
 func TestTopicUUID(t *testing.T) {
-	uuids := make(map[uuid.UUID]bool)
+	uuids := make(map[string]bool)
 	for i := 0; i < 1000000; i++ {
 		topic := NewTopic()
-		if _, ok := uuids[topic.ID()]; ok {
+		if _, ok := uuids[topic.ID().String()]; ok {
 			t.Error("We have a repeated UUID.. Bad thing")
 		}
-		uuids[topic.ID()] = true
+		uuids[topic.ID().String()] = true
 	}
 }
 
@@ -46,6 +45,8 @@ func TestTopicTimes(t *testing.T) {
 	}
 	oldCreationDate := topic.CreationDate()
 	oldModDate := topic.ModDate()
+
+	time.Sleep(1 * time.Millisecond)
 
 	topic.SetTitle("San Roque's dog has no tail")
 	topic.SetBody("Because Ramon Ramirez has cut it")

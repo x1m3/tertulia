@@ -8,7 +8,7 @@ import (
 )
 
 type Topic struct {
-	id           uuid.UUID
+	id           *uuid.UUID
 	title        string
 	body         *zstrings.ZString
 	author       *Person
@@ -19,19 +19,19 @@ type Topic struct {
 type TopicList []*Topic
 
 func NewTopic() *Topic {
-	uuid, err := uuid.NewV4()
+	id, err := uuid.NewV4()
 	if err != nil {
 		logrus.Errorf("Error generating UUID for Topic : <%s>", err)
 	}
 	now := time.Now()
 	return &Topic{
-		id:*uuid,
+		id:id,
 		creationDate: now,
 		modDate:now,
 	}
 }
 
-func (t *Topic) ID() uuid.UUID {
+func (t *Topic) ID() *uuid.UUID {
 	return t.id
 }
 
@@ -43,6 +43,14 @@ func (t *Topic) SetTitle(title string) {
 func (t *Topic) SetBody(body string) {
 	t.body = zstrings.NewZStringCompressed(body)
 	t.modDate = time.Now()
+}
+
+func (t *Topic) SetCreationDate(tim time.Time) {
+	t.creationDate = tim
+}
+
+func (t *Topic) SetModDate(tim time.Time) {
+	t.modDate = tim
 }
 
 func (t *Topic) Title() string {
