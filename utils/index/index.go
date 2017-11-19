@@ -1,104 +1,60 @@
 package index
 
 import (
-	"github.com/google/btree"
 	"sync"
+	"github.com/x1m3/Tertulia/utils/uniqueIndex"
+	"github.com/google/btree"
+	"fmt"
+	"github.com/davecgh/go-spew/spew"
 )
 
-// A thread safe wrapper for the github.com/google/btree implementation
+type IdxItem struct {
+	index uniqueIndex.IdxItem
+	values IdxItemList
+}
+
+
+func (i IdxItem) Less(than btree.Item) bool {
+	fmt.Println("En el primer less")
+	spew.Dump(than)
+	return i.index.Less(than)
+}
+
 type Index struct {
 	sync.RWMutex
-	tree  *btree.BTree
+	index *uniqueIndex.Index
 }
 
-type IdxItem btree.Item
+type IdxItemList []uniqueIndex.IdxItem
 
-type IdxItemList []IdxItem
 
-func (i IdxItemList) From(pos int) IdxItemList {
-	if pos>=0 && len(i)>pos {
-		return i[pos:]
-	}else {
-		return nil
-	}
+func New(degree int) *Index{
+	return &Index{index:uniqueIndex.New(degree)}
 }
 
-func (i IdxItemList) Limit(lim int) IdxItemList {
-	if lim<=0 {
-		return nil
-	}
-	if len(i)<lim {
-		lim = len(i)
-	}
-	r := make(IdxItemList, lim)
-	_ = copy(r,i[:lim])
-	return r
-}
-
-func New(index int) *Index {
-	return &Index{tree:btree.New(index)}
-}
-
-func (i *Index) ReplaceOrInsert(item IdxItem) IdxItem {
+func (i *Index) Insert(item uniqueIndex.IdxItem) *IdxItem {
 	i.Lock()
 	defer i.Unlock()
-	return i.tree.ReplaceOrInsert(item)
+
+	fmt.Println("lala1")
+	previous := i.index.Get(item)
+	fmt.Println("lala2")
+	if previous!=nil {
+		fmt.Println("lala3")
+		newItem := previous.(IdxItem)
+		newItem.values = append(newItem.values, item)
+		i.index.ReplaceOrInsert(newItem)
+
+	} else {
+		fmt.Println("lala4")
+		newItem := IdxItem{index:item}
+		newItem.values = append(newItem.values, item)
+		i.index.ReplaceOrInsert(newItem)
+	}
+	return nil
+
 }
 
-func (i *Index) Get(key IdxItem) IdxItem {
-	i.RLock()
-	defer i.RUnlock()
-	return i.tree.Get(key)
-}
-
-func (i *Index) Has(key IdxItem) bool {
-	i.RLock()
-	defer i.RUnlock()
-	return i.tree.Has(key)
-}
-
-func (i *Index) Delete(item IdxItem) IdxItem {
-	i.Lock()
-	defer i.Unlock()
-	return i.tree.Delete(item)
-}
-
-func (i *Index) Len() int {
-	i.RLock()
-	defer i.RUnlock()
-	return i.tree.Len()
-}
-
-func (i *Index) Max() IdxItem {
-	i.RLock()
-	defer i.RUnlock()
-	return i.tree.Max()
-}
-
-func (i *Index) Min() IdxItem {
-	i.RLock()
-	defer i.RUnlock()
-	return i.tree.Min()
-}
-
-func (i *Index) AllAsc() IdxItemList {
-	i.RLock()
-	defer i.RUnlock()
-	all := make([]IdxItem,0, i.tree.Len())
-	i.tree.Ascend(func(a btree.Item) bool {
-		all = append(all, a)
-		return true
-	})
-	return all
-}
-
-func (i *Index) AllDesc() IdxItemList {
-	i.RLock()
-	defer i.RUnlock()
-	all := make([]IdxItem,0, i.tree.Len())
-	i.tree.Descend(func(a btree.Item) bool {
-		all = append(all, a)
-		return true
-	})
-	return all
+func (i *Index) Get(key IdxItem) IdxItemList {
+	return i.index.Get(key).(IdxItem).values
 }
