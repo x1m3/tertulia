@@ -1,26 +1,12 @@
 package repos
 
 import (
+	"github.com/google/btree"
 	"github.com/x1m3/Tertulia/model"
 	"github.com/nu7hatch/gouuid"
-	"errors"
-	"sync"
 	"time"
-	"github.com/google/btree"
+	"sync"
 )
-
-var ErrNotFound = errors.New("element not found in repo")
-var ErrDuplicatedValue = errors.New("duplicated value in repo")
-var ErrDuplicatedIndexValue = errors.New("duplicated index value in repo")
-var ErrIndexNotFound = errors.New("index value not found while updating")
-
-type Itopics interface {
-	Add(*model.Topic) error
-	Get(id *uuid.UUID) (*model.Topic, error)
-	Update(*model.Topic) error
-	GetByCreatedDateDesc(from int, limit int) []*model.Topic
-	GetByUpdatedDateDesc(from int, limit int) []*model.Topic
-}
 
 type TopicsMemory struct {
 	sync.RWMutex
