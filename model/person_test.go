@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 	"strconv"
+	"github.com/nu7hatch/gouuid"
 )
 
 func TestPerson(t *testing.T) {
@@ -26,7 +27,8 @@ func TestAddTopicsToPerson(t *testing.T) {
 	p := NewPerson("xime")
 
 	for i := 0; i < 1000; i++ {
-		t := NewTopic()
+		id,_ := uuid.NewV4()
+		t := NewTopic(id)
 		t.SetTitle("Title" + strconv.Itoa(i))
 		t.SetBody("Body" + strconv.Itoa(i))
 		t.SetAuthor(p)

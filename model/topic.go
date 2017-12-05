@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/nu7hatch/gouuid"
-	"github.com/Sirupsen/logrus"
 	"time"
 	"github.com/x1m3/Tertulia/utils/zstrings"
 )
@@ -18,11 +17,7 @@ type Topic struct {
 
 type TopicList []*Topic
 
-func NewTopic() *Topic {
-	id, err := uuid.NewV4()
-	if err != nil {
-		logrus.Errorf("Error generating UUID for Topic : <%s>", err)
-	}
+func NewTopic(id *uuid.UUID) *Topic {
 	now := time.Now()
 	return &Topic{
 		id:id,
