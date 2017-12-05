@@ -1,8 +1,7 @@
-package repos
+package model
 
 import (
 	"github.com/google/btree"
-	"github.com/x1m3/Tertulia/model"
 	"github.com/nu7hatch/gouuid"
 	"time"
 	"sync"
@@ -12,22 +11,22 @@ type TopicsMemory struct {
 	sync.RWMutex
 	indexCreatedDate *btree.BTree
 	indexUpdatedDate *btree.BTree
-	memory           map[string]*model.Topic
+	memory           map[uuid.UUID]*Topic
 }
 
 func NewTopicsMemory () *TopicsMemory{
 	return &TopicsMemory{
 		indexUpdatedDate: btree.New(4),
 		indexCreatedDate: btree.New(4),
-		memory : make(map[string]*model.Topic),
+		memory : make(map[uuid.UUID]*Topic),
 	}
 }
 
-func (r *TopicsMemory) Add(topic *model.Topic) error {
+func (r *TopicsMemory) Add(topic *Topic) error {
 	r.Lock()
 	defer r.Unlock()
 
-	if _, found := r.memory[topic.ID().String()]; found {
+	if _, found := r.memory[*topic.ID()]; found {
 		return ErrDuplicatedValue
 	}
 
@@ -36,54 +35,60 @@ func (r *TopicsMemory) Add(topic *model.Topic) error {
 		return err
 	}
 
-	r.memory[topic.ID().String()] = topic
+	r.memory[*topic.ID()] = topic
 	return nil
 }
 
-func (r *TopicsMemory) Get(id *uuid.UUID) (*model.Topic, error) {
-	var t *model.Topic
+func (r *TopicsMemory) Get(id *uuid.UUID) (*Topic, error) {
+	var t *Topic
 	var found bool
 
 	r.RLock()
 	defer r.RUnlock()
 
-	if t, found = r.memory[id.String()]; !found {
+	if t, found = r.memory[*id]; !found {
 		return nil, ErrNotFound
 	}
 	return t, nil
 
 }
 
-func (r *TopicsMemory) Update(t *model.Topic) error {
+func (r *TopicsMemory) Update(t *Topic) error {
 
 	r.Lock()
 	defer r.Unlock()
 
-	if _, found := r.memory[t.ID().String()]; !found {
+	if _, found := r.memory[*t.ID()]; !found {
 		return ErrNotFound
 	}
-	r.memory[t.ID().String()] = t
+
+	err := r.updateIndexes(t)
+	if err!=nil {
+		return err
+	}
+
+	r.memory[*t.ID()] = t
 	return nil
 }
 
-func (r *TopicsMemory) GetByCreatedDateDesc(from int, limit int) []*model.Topic {
+func (r *TopicsMemory) GetByCreatedDateDesc(from int, limit int) []*Topic {
 	return r.getByIndexDescend(r.indexCreatedDate, from, limit)
 }
 
-func (r *TopicsMemory) GetByUpdatedDateDesc(from int, limit int) []*model.Topic {
+func (r *TopicsMemory) GetByUpdatedDateDesc(from int, limit int) []*Topic {
 	return r.getByIndexDescend(r.indexUpdatedDate, from, limit)
 }
 
 type dateIdxItem struct {
 	time  time.Time
-	topic *model.Topic
+	topic *Topic
 }
 
 func (t dateIdxItem) Less(than btree.Item) bool {
 	return t.time.Before(than.(dateIdxItem).time)
 }
 
-func (r *TopicsMemory) addToIndexes(t *model.Topic) error {
+func (r *TopicsMemory) addToIndexes(t *Topic) error {
 	var p btree.Item
 	p = r.indexCreatedDate.ReplaceOrInsert(dateIdxItem{time: t.CreationDate(), topic: t})
 	if p != nil { // Repeated value.. Let's abort
@@ -99,7 +104,7 @@ func (r *TopicsMemory) addToIndexes(t *model.Topic) error {
 	return nil
 }
 
-func (r *TopicsMemory) updateIndexes(t *model.Topic) error {
+func (r *TopicsMemory) updateIndexes(t *Topic) error {
 	var p btree.Item
 	var creationDateIdx, updatedDateIdx dateIdxItem
 
@@ -121,14 +126,14 @@ func (r *TopicsMemory) updateIndexes(t *model.Topic) error {
 	return nil
 }
 
-func (r *TopicsMemory) getByIndexDescend(index *btree.BTree, from int, limit int) []*model.Topic {
-	var all []*model.Topic
+func (r *TopicsMemory) getByIndexDescend(index *btree.BTree, from int, limit int) []*Topic {
+	var all []*Topic
 	var c, stored int
 
 	if limit == 0 {
-		all = make([]*model.Topic, 0)
+		all = make([]*Topic, 0)
 	} else {
-		all = make([]*model.Topic, 0, limit)
+		all = make([]*Topic, 0, limit)
 	}
 	c = 0
 	stored = 0

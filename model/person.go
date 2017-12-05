@@ -28,8 +28,8 @@ func NewPerson(nickname string) *Person{
 	}
 }
 
-func (p *Person) ID() uuid.UUID {
-	return p.id
+func (p *Person) ID() *uuid.UUID {
+	return &p.id
 }
 
 func (p *Person) Nickname() string {

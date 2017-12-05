@@ -7,7 +7,7 @@ import (
 )
 
 type Topic struct {
-	id           *uuid.UUID
+	id           uuid.UUID
 	title        string
 	body         *zstrings.ZString
 	author       *Person
@@ -20,14 +20,14 @@ type TopicList []*Topic
 func NewTopic(id *uuid.UUID) *Topic {
 	now := time.Now()
 	return &Topic{
-		id:id,
+		id:*id,
 		creationDate: now,
 		modDate:now,
 	}
 }
 
 func (t *Topic) ID() *uuid.UUID {
-	return t.id
+	return &t.id
 }
 
 func (t *Topic) SetTitle(title string) {
