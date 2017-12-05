@@ -2,8 +2,8 @@ package dbentities
 
 import (
 	"github.com/nu7hatch/gouuid"
-	"time"
 	"github.com/x1m3/Tertulia/model"
+	"time"
 )
 
 type Topic struct {
@@ -24,14 +24,4 @@ func NewTopic(topic *model.Topic) *Topic {
 		CreationDate: topic.CreationDate(),
 		ModDate:      topic.ModDate(),
 	}
-}
-
-func (t *Topic) Topic() *model.Topic {
-	topic := model.NewTopic(&t.Id)
-	topic.SetTitle(t.Title)
-	topic.SetBody(t.Body)
-	topic.SetCreationDate(t.CreationDate)
-	topic.SetModDate(t.ModDate)
-	topic.SetAuthor(nil)
-	return topic
 }

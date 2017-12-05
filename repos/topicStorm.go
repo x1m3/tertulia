@@ -19,46 +19,39 @@ func (r *TopicsStorm) Add(topic *model.Topic) error {
 	return r.db.Save(dbentities.NewTopic(topic))
 }
 
-func (r *TopicsStorm) Get(id *uuid.UUID) (*model.Topic, error) {
-	var dto dbentities.Topic
-
-	err := r.db.One("Id", id, &dto)
-	if err != nil {
+func (r *TopicsStorm) Get(id *uuid.UUID) (*dbentities.Topic, error) {
+	topic := &dbentities.Topic{}
+	err := r.db.One("Id", id, topic)
+	switch err {
+	case nil:
+		return topic, nil
+	case storm.ErrNotFound:
+		return nil, model.ErrNotFound
+	default:
 		return nil, err
 	}
-	return dto.Topic(), nil
 }
 
 func (r *TopicsStorm) Update(topic *model.Topic) error {
-	return r.db.Update(dbentities.NewTopic(topic))
-}
-
-func (r *TopicsStorm) GetByCreatedDateDesc(from int, limit int) []*model.Topic {
-	return r.getByIndexDescend("CreationDate", from, limit)
-}
-
-func (r *TopicsStorm) GetByUpdatedDateDesc(from int, limit int) []*model.Topic {
-	return r.getByIndexDescend("ModDate", from, limit)
-}
-
-func (r *TopicsStorm) getByIndexDescend(index string, from int, limit int) []*model.Topic {
-	var topicsDTO []dbentities.Topic
-	var err error
-
-	if limit == 0 {
-		err = r.db.AllByIndex(index, &topicsDTO, storm.Reverse(), storm.Skip(from))
-	} else {
-		err = r.db.AllByIndex(index, &topicsDTO, storm.Reverse(), storm.Skip(from), storm.Limit(limit))
-	}
-	if err != nil {
+	err := r.db.Update(dbentities.NewTopic(topic))
+	switch err {
+	case nil:
 		return nil
+	case storm.ErrNotFound:
+		return model.ErrNotFound
+	default:
+		return err
 	}
+}
 
-	topics := make([]*model.Topic, 0, len(topicsDTO))
-
-	for _, t := range topicsDTO {
-		topics = append(topics, t.Topic())
+func (r *TopicsStorm) Delete(topic *model.Topic) error {
+	err := r.db.DeleteStruct(dbentities.NewTopic(topic))
+	switch err {
+	case nil:
+		return nil
+	case storm.ErrNotFound:
+		return model.ErrNotFound
+	default:
+		return err
 	}
-
-	return topics
 }

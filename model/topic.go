@@ -2,8 +2,8 @@ package model
 
 import (
 	"github.com/nu7hatch/gouuid"
-	"time"
 	"github.com/x1m3/Tertulia/utils/zstrings"
+	"time"
 )
 
 type Topic struct {
@@ -20,9 +20,9 @@ type TopicList []*Topic
 func NewTopic(id *uuid.UUID) *Topic {
 	now := time.Now()
 	return &Topic{
-		id:*id,
+		id:           *id,
 		creationDate: now,
-		modDate:now,
+		modDate:      now,
 	}
 }
 
@@ -53,7 +53,11 @@ func (t *Topic) Title() string {
 }
 
 func (t *Topic) Body() string {
-	return t.body.Value()
+	if t.body != nil {
+		return t.body.Value()
+	} else {
+		return ""
+	}
 }
 
 func (t *Topic) CreationDate() time.Time {
