@@ -77,7 +77,9 @@ func TestTopicsRepo(t *testing.T) {
 	// Let's update a non existing topic
 	randUUID, _ = uuid.NewV4()
 	rt := model.NewTopic(randUUID)
-	rt.SetAuthor(model.NewPerson("lala"))
+
+	randUUID, _ = uuid.NewV4()
+	rt.SetAuthor(model.NewPerson(randUUID))
 	err = repo.Update(rt)
 	if err != model.ErrNotFound {
 		t.Error("expecting err= model.ErrNotFound updating a non existing item")
@@ -144,7 +146,11 @@ func loadTopicsFromCSV(filename string) (*model.TopicsMemory, error) {
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("Bad date format in testdata <%s>", item.CreatedOn))
 		}
-		topic.SetAuthor(model.NewPerson(item.Author))
+		pid, _ := uuid.NewV4()
+		person := model.NewPerson(pid)
+		person.SetNickname("manolito")
+		topic.SetAuthor(person)
+
 		topic.SetCreationDate(createdOn)
 		topic.SetModDate(createdOn)
 
