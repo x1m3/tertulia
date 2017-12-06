@@ -17,7 +17,3 @@ type ItopicsCRUD interface {
 	Update(*model.Topic) error
 	Delete(*model.Topic) error
 }
-
-type ItopicsAll interface {
-	All() chan []TopicError
-}
