@@ -55,3 +55,24 @@ func (r *TopicsStorm) Delete(topic *model.Topic) error {
 		return err
 	}
 }
+
+func (r *TopicsStorm) All(responseChan chan TopicError) {
+	buffersize := 1 + 2*cap(responseChan)
+	count := 0
+
+	for {
+		topics := make([]dbentities.Topic, 0, buffersize)
+		err := r.db.All(&topics, storm.Skip(count), storm.Limit(buffersize))
+		if err != nil {
+			responseChan <- TopicError{Topic: nil, Err: err}
+		}
+		if len(topics) == 0 {
+			close(responseChan)
+			return
+		}
+		count += buffersize
+		for _, topic := range topics {
+			responseChan <- TopicError{Topic: &topic, Err: nil}
+		}
+	}
+}

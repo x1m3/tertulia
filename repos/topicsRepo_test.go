@@ -2,16 +2,16 @@ package repos_test
 
 import (
 	"encoding/json"
-	"github.com/nu7hatch/gouuid"
-	"github.com/x1m3/Tertulia/model"
-	"github.com/x1m3/Tertulia/repos"
-	"os"
-	"testing"
-	"time"
-
 	"errors"
 	"fmt"
 	"github.com/asdine/storm"
+	"github.com/nu7hatch/gouuid"
+	"github.com/x1m3/Tertulia/model"
+	"github.com/x1m3/Tertulia/repos"
+	"math/rand"
+	"os"
+	"testing"
+	"time"
 )
 
 type csvDTO struct {
@@ -34,7 +34,7 @@ func TestTopicsRepo(t *testing.T) {
 
 	repo := repos.NewTopicsStorm(db)
 
-	topics, err := loadTopicsFromCSV("testdata/random_topics.json")
+	topics, err := loadTopicsFromCSV("testdata/random_topics.json", 1)
 	if err != nil {
 		t.Error(err)
 	}
@@ -122,11 +122,56 @@ func TestTopicsRepo(t *testing.T) {
 	}
 }
 
-func loadTopicsFromCSV(filename string) (*model.TopicsMemory, error) {
+func TestTopicsRepoAll(t *testing.T) {
+	db, err := storm.Open("test.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		db.Close()
+		os.Remove("test.db")
+	}()
+
+	repo := repos.NewTopicsStorm(db)
+
+	topics, err := loadTopicsFromCSV("testdata/random_topics.json", 10)
+	if err != nil {
+		t.Error(err)
+	}
+	// Adding all topics to repo
+	for _, topic := range topics.GetByCreatedDateDesc(0, 0) {
+		repo.Add(topic)
+	}
+
+	responses := make(chan repos.TopicError)
+
+	go repo.All(responses)
+	count := 0
+	for topic := range responses {
+		count++
+		if topic.Err != nil {
+			t.Error(topic.Err)
+		}
+		_, err := repo.Get(&topic.Topic.Id)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+
+	if count != len(topics.GetByCreatedDateDesc(0, 0)) {
+		t.Error("Expecting <%d> elements when getting all. Got <%d>", len(topics.GetByCreatedDateDesc(0, 0)), count)
+	}
+}
+
+func loadTopicsFromCSV(filename string, nTimes int) (*model.TopicsMemory, error) {
+
+	if nTimes <= 0 {
+		nTimes = 1
+	}
 
 	topicsRepo := model.NewTopicsMemory()
 
-	csvFile, err := os.Open("testdata/random_topics.json")
+	csvFile, err := os.Open(filename)
 	if err != nil {
 		panic("Cannot open test file")
 	}
@@ -137,26 +182,29 @@ func loadTopicsFromCSV(filename string) (*model.TopicsMemory, error) {
 	fileItems := make([]csvDTO, 0)
 	encoder.Decode(&fileItems)
 
-	for _, item := range fileItems {
-		id, _ := uuid.NewV4()
-		topic := model.NewTopic(id)
-		topic.SetTitle(item.Title)
-		topic.SetBody(item.Body)
-		createdOn, err := time.Parse("2006-01-02 15:04:05", item.CreatedOn)
-		if err != nil {
-			return nil, errors.New(fmt.Sprintf("Bad date format in testdata <%s>", item.CreatedOn))
-		}
-		pid, _ := uuid.NewV4()
-		person := model.NewPerson(pid)
-		person.SetNickname("manolito")
-		topic.SetAuthor(person)
+	for i := 0; i < nTimes; i++ {
+		for _, item := range fileItems {
+			id, _ := uuid.NewV4()
+			topic := model.NewTopic(id)
+			topic.SetTitle(item.Title)
+			topic.SetBody(item.Body)
+			createdOn, err := time.Parse("2006-01-02 15:04:05", item.CreatedOn)
+			if err != nil {
+				return nil, errors.New(fmt.Sprintf("Bad date format in testdata <%s>", item.CreatedOn))
+			}
+			createdOn = createdOn.Add(time.Duration(rand.Intn(1000)) * time.Millisecond)
+			pid, _ := uuid.NewV4()
+			person := model.NewPerson(pid)
+			person.SetNickname("manolito")
+			topic.SetAuthor(person)
 
-		topic.SetCreationDate(createdOn)
-		topic.SetModDate(createdOn)
+			topic.SetCreationDate(createdOn)
+			topic.SetModDate(createdOn)
 
-		err = topicsRepo.Add(topic)
-		if err != nil {
-			return nil, err
+			err = topicsRepo.Add(topic)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return topicsRepo, nil

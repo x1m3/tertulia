@@ -7,8 +7,8 @@ import (
 )
 
 type TopicError struct {
-	topic *model.Topic
-	err   error
+	Topic *dbentities.Topic
+	Err   error
 }
 
 type ItopicsCRUD interface {
@@ -16,4 +16,8 @@ type ItopicsCRUD interface {
 	Get(id *uuid.UUID) (*dbentities.Topic, error)
 	Update(*model.Topic) error
 	Delete(*model.Topic) error
+}
+
+type ItopicsAll interface {
+	All(chan TopicError)
 }
