@@ -16,6 +16,7 @@ func NewTopicsStorm(db *storm.DB) *TopicsStorm {
 }
 
 func (r *TopicsStorm) Add(topic *model.Topic) error {
+	// TODO: Return a repo generic error
 	return r.db.Save(dbentities.NewTopic(topic))
 }
 
@@ -26,6 +27,7 @@ func (r *TopicsStorm) Get(id *uuid.UUID) (*dbentities.Topic, error) {
 	case nil:
 		return topic, nil
 	case storm.ErrNotFound:
+		// TODO: Return a repo error, not a model one
 		return nil, model.ErrNotFound
 	default:
 		return nil, err
@@ -38,6 +40,7 @@ func (r *TopicsStorm) Update(topic *model.Topic) error {
 	case nil:
 		return nil
 	case storm.ErrNotFound:
+		// TODO: Return a repo error, not a model one
 		return model.ErrNotFound
 	default:
 		return err
@@ -50,6 +53,7 @@ func (r *TopicsStorm) Delete(topic *model.Topic) error {
 	case nil:
 		return nil
 	case storm.ErrNotFound:
+		// TODO: Return a repo error, not a model one
 		return model.ErrNotFound
 	default:
 		return err
