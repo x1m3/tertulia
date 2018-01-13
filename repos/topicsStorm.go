@@ -17,11 +17,11 @@ func NewTopicsStorm(db *storm.DB) *TopicsStorm {
 
 func (r *TopicsStorm) Add(topic *model.Topic) error {
 	// TODO: Return a repo generic error
-	return r.db.Save(dbentities.NewTopic(topic))
+	return r.db.Save(dbentities.NewTopicDTO(topic))
 }
 
-func (r *TopicsStorm) Get(id *uuid.UUID) (*dbentities.Topic, error) {
-	topic := &dbentities.Topic{}
+func (r *TopicsStorm) Get(id *uuid.UUID) (*dbentities.TopicDTO, error) {
+	topic := &dbentities.TopicDTO{}
 	err := r.db.One("Id", id, topic)
 	switch err {
 	case nil:
@@ -35,7 +35,7 @@ func (r *TopicsStorm) Get(id *uuid.UUID) (*dbentities.Topic, error) {
 }
 
 func (r *TopicsStorm) Update(topic *model.Topic) error {
-	err := r.db.Update(dbentities.NewTopic(topic))
+	err := r.db.Update(dbentities.NewTopicDTO(topic))
 	switch err {
 	case nil:
 		return nil
@@ -48,7 +48,7 @@ func (r *TopicsStorm) Update(topic *model.Topic) error {
 }
 
 func (r *TopicsStorm) Delete(topic *model.Topic) error {
-	err := r.db.DeleteStruct(dbentities.NewTopic(topic))
+	err := r.db.DeleteStruct(dbentities.NewTopicDTO(topic))
 	switch err {
 	case nil:
 		return nil
@@ -60,15 +60,15 @@ func (r *TopicsStorm) Delete(topic *model.Topic) error {
 	}
 }
 
-func (r *TopicsStorm) All(responseChan chan TopicError) {
+func (r *TopicsStorm) All(responseChan chan model.TopicError) {
 	buffersize := 1 + 2*cap(responseChan)
 	count := 0
 
 	for {
-		topics := make([]dbentities.Topic, 0, buffersize)
+		topics := make([]dbentities.TopicDTO, 0, buffersize)
 		err := r.db.All(&topics, storm.Skip(count), storm.Limit(buffersize))
 		if err != nil {
-			responseChan <- TopicError{Topic: nil, Err: err}
+			responseChan <- model.TopicError{Topic: nil, Err: err}
 		}
 		if len(topics) == 0 {
 			close(responseChan)
@@ -76,7 +76,7 @@ func (r *TopicsStorm) All(responseChan chan TopicError) {
 		}
 		count += buffersize
 		for _, topic := range topics {
-			responseChan <- TopicError{Topic: &topic, Err: nil}
+			responseChan <- model.TopicError{Topic: topic.ToTopic(), Err: nil}
 		}
 	}
 }

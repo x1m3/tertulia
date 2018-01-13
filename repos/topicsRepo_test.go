@@ -51,19 +51,19 @@ func TestTopicsRepo(t *testing.T) {
 			t.Error(err)
 		}
 		if topic.ID().String() != dto.Id.String() {
-			t.Errorf("Topic ID differ. Expecting <%v>, got <%v>", topic.ID().String(), dto.Id.String())
+			t.Errorf("TopicDTO ID differ. Expecting <%v>, got <%v>", topic.ID().String(), dto.Id.String())
 		}
 		if topic.Author().ID().String() != dto.Author.String() {
 			t.Errorf("Author ID differ. Expecting <%v>, got <%v>", topic.Author().ID().String(), dto.Author.String())
 		}
 		if topic.Body() != dto.Body {
-			t.Errorf("Topic Body differ. Expecting <%v>, got <%v>", topic.Body(), dto.Body)
+			t.Errorf("TopicDTO Body differ. Expecting <%v>, got <%v>", topic.Body(), dto.Body)
 		}
 		if topic.CreationDate() != dto.CreationDate {
-			t.Errorf("Topic creation date differ. Expecting <%v>, got <%v>", topic.CreationDate(), dto.CreationDate)
+			t.Errorf("TopicDTO creation date differ. Expecting <%v>, got <%v>", topic.CreationDate(), dto.CreationDate)
 		}
 		if topic.ModDate() != dto.ModDate {
-			t.Errorf("Topic modification date differ. Expecting <%v>, got <%v>", topic.ModDate(), dto.ModDate)
+			t.Errorf("TopicDTO modification date differ. Expecting <%v>, got <%v>", topic.ModDate(), dto.ModDate)
 		}
 	}
 
@@ -143,7 +143,7 @@ func TestTopicsRepoAll(t *testing.T) {
 		repo.Add(topic)
 	}
 
-	responses := make(chan repos.TopicError)
+	responses := make(chan model.TopicError)
 
 	go repo.All(responses)
 	count := 0
@@ -152,7 +152,7 @@ func TestTopicsRepoAll(t *testing.T) {
 		if topic.Err != nil {
 			t.Error(topic.Err)
 		}
-		_, err := repo.Get(&topic.Topic.Id)
+		_, err := repo.Get(topic.Topic.ID())
 		if err != nil {
 			t.Error(err)
 		}
@@ -163,13 +163,13 @@ func TestTopicsRepoAll(t *testing.T) {
 	}
 }
 
-func loadTopicsFromCSV(filename string, nTimes int) (*model.TopicsMemory, error) {
+func loadTopicsFromCSV(filename string, nTimes int) (*model.Topics, error) {
 
 	if nTimes <= 0 {
 		nTimes = 1
 	}
 
-	topicsRepo := model.NewTopicsMemory()
+	topicsRepo := model.NewTopics()
 
 	csvFile, err := os.Open(filename)
 	if err != nil {

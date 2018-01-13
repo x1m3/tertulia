@@ -1,10 +1,10 @@
 package model
 
 import (
-	"testing"
-	"os"
 	"encoding/json"
 	"github.com/nu7hatch/gouuid"
+	"os"
+	"testing"
 	"time"
 )
 
@@ -19,8 +19,7 @@ type csvDTO struct {
 
 func TestTopicRepo(t *testing.T) {
 
-
-	topicsRepo := NewTopicsMemory()
+	topicsRepo := NewTopics()
 
 	csvFile, err := os.Open("testdata/random_topics.json")
 	if err != nil {
@@ -35,12 +34,12 @@ func TestTopicRepo(t *testing.T) {
 
 	// Load all items in memory
 	generatedIds := make([]*uuid.UUID, 0, len(fileItems))
-	for _, item := range (fileItems) {
+	for _, item := range fileItems {
 		id, _ := uuid.NewV4()
 		topic := NewTopic(id)
 		topic.SetTitle(item.Title)
 		topic.SetBody(item.Body)
-		createdOn, err := time.Parse("2006-01-02 15:04:05", item.CreatedOn, )
+		createdOn, err := time.Parse("2006-01-02 15:04:05", item.CreatedOn)
 		if err != nil {
 			t.Fatalf("Bad date format in testdata <%s>", item.CreatedOn)
 		}
