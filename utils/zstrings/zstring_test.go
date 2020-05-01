@@ -1,9 +1,9 @@
 package zstrings
 
 import (
-	"testing"
-	"runtime"
 	"fmt"
+	"runtime"
+	"testing"
 )
 
 func TestZString(t *testing.T) {
@@ -149,7 +149,6 @@ func TestZString(t *testing.T) {
 		¿Mi única patria? ¡La mar! `,
 	}
 
-
 	for _, i := range strings {
 		s := NewZString(i)
 		sz := NewZStringCompressed(i)
@@ -202,7 +201,7 @@ func TestMemory(t *testing.T) {
 		lista2[i] = NewZStringCompressed(text)
 	}
 	runtime.ReadMemStats(&m3)
-	fmt.Printf("Bytes allocated uncompressed: %v\n", m2.Alloc - m1.Alloc)
-	fmt.Printf("Bytes allocated compressed: %v\n", m3.Alloc - m2.Alloc)
-	fmt.Printf("Memory saved: %d %\n", 100 * (m3.Alloc - m2.Alloc) / (m2.Alloc - m1.Alloc))
+	fmt.Printf("Bytes allocated uncompressed: %v\n", m2.Alloc-m1.Alloc)
+	fmt.Printf("Bytes allocated compressed: %v\n", m3.Alloc-m2.Alloc)
+	fmt.Printf("Memory saved: %d \n", 100*(m3.Alloc-m2.Alloc)/(m2.Alloc-m1.Alloc))
 }
