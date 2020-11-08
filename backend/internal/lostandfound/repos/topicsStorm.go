@@ -3,8 +3,8 @@ package repos
 import (
 	"github.com/asdine/storm"
 	"github.com/nu7hatch/gouuid"
-	"github.com/x1m3/Tertulia/internal/lostandfound/model"
-	"github.com/x1m3/Tertulia/internal/lostandfound/repos/dbentities"
+	"github.com/x1m3/Tertulia/backend/internal/lostandfound/model"
+	"github.com/x1m3/Tertulia/backend/internal/lostandfound/repos/dbentities"
 )
 
 type TopicsStorm struct {

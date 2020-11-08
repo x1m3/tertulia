@@ -62,6 +62,3 @@ func BenchmarkZStringCompressed(b *testing.B) {
 	}
 	_ = s
 }
-
-
-

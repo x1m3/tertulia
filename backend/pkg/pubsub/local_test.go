@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/x1m3/Tertulia/pkg/pubsub"
+	"github.com/x1m3/Tertulia/backend/pkg/pubsub"
 	"sync"
 	"testing"
 

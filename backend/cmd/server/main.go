@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"github.com/x1m3/Tertulia/backend/pkg/pubsub"
+	"github.com/x1m3/Tertulia/backend/pkg/service"
 
-	"github.com/x1m3/Tertulia/internal/server"
+	"github.com/x1m3/Tertulia/backend/internal/server"
 	"math/rand"
 
 	"os"
@@ -23,7 +25,10 @@ func main() {
 	ctx, cancelContext := context.WithCancel(context.Background())
 	defer cancelContext()
 
-	logrus.Info("starting Tertulia")
+	logrus.Info("Starting Tertulia")
+
+	kernel := service.NewKernel(ctx, pubsub.Local(ctx), service.WithServices())
+	kernel.Init()
 
 	// Creating and starting and http server for public api
 	logrus.WithFields(logrus.Fields{"port": httpPort}).Info("Tertulia started")
