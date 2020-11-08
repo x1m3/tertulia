@@ -2,7 +2,7 @@ package model
 
 import (
 	"github.com/nu7hatch/gouuid"
-	"github.com/x1m3/Tertulia/internal/lostandfound/utils/zstrings"
+	"github.com/x1m3/Tertulia/backend/internal/lostandfound/utils/zstrings"
 	"time"
 )
 

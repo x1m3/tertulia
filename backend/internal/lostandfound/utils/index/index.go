@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/btree"
-	"github.com/x1m3/Tertulia/internal/lostandfound/utils/uniqueIndex"
+	"github.com/x1m3/Tertulia/backend/internal/lostandfound/utils/uniqueIndex"
 	"sync"
 )
 
