@@ -14,6 +14,7 @@ require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/prometheus/common v0.14.0
 	github.com/sirupsen/logrus v1.7.0
+	github.com/stretchr/testify v1.4.0
 	github.com/ugorji/go v1.1.13 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	go.etcd.io/bbolt v1.3.5 // indirect
