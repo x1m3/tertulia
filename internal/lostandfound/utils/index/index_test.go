@@ -1,11 +1,9 @@
 package index
 
 import (
-
 	"fmt"
 	"github.com/google/btree"
 )
-
 
 type testItem struct {
 	key   int
@@ -13,7 +11,7 @@ type testItem struct {
 }
 
 func NewTestItem(key int, val string) *testItem {
-	return &testItem{key:key, value:val}
+	return &testItem{key: key, value: val}
 }
 
 func (a testItem) Less(b btree.Item) bool {

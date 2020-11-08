@@ -2,7 +2,7 @@ package dbentities
 
 import (
 	"github.com/nu7hatch/gouuid"
-	"github.com/x1m3/Tertulia/model"
+	"github.com/x1m3/Tertulia/internal/lostandfound/model"
 	"time"
 )
 

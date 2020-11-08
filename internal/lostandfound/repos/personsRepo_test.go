@@ -3,8 +3,8 @@ package repos_test
 import (
 	"github.com/asdine/storm"
 	"github.com/nu7hatch/gouuid"
-	"github.com/x1m3/Tertulia/model"
-	"github.com/x1m3/Tertulia/repos"
+	"github.com/x1m3/Tertulia/internal/lostandfound/model"
+	"github.com/x1m3/Tertulia/internal/lostandfound/repos"
 	"os"
 	"testing"
 	"time"
