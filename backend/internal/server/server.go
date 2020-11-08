@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/prometheus/common/log"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
@@ -53,9 +52,9 @@ func (d *HTTPd) CustomizeNotFoundError(handlers ...gin.HandlerFunc) {
 
 func (d *HTTPd) ListenAndServe(ctx context.Context) {
 	if err := d.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logrus.Errorf("Error starting server", "err", err)
+		logrus.WithFields(logrus.Fields{"err": err}).Error("Error starting server")
 	}
-	log.Info(ctx, "Server down")
+	logrus.Info(ctx, "Server down")
 }
 
 func (d *HTTPd) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +65,7 @@ func (d *HTTPd) Shutdown(ctx context.Context) {
 	canCtx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancelFn()
 	if err := d.server.Shutdown(canCtx); err != nil {
-		logrus.Errorf("error during server shutdown:", "err", err)
+		logrus.WithFields(logrus.Fields{"err": err}).Error("Error shooting down server")
 	}
 }
 

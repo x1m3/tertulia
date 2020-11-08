@@ -64,7 +64,7 @@ func TestAddRemove(t *testing.T) {
 	for _, item := range all {
 		o := item.(testItem)
 		if o.key != i || o.value != strconv.Itoa(i) {
-			t.Errorf("index.GetAll() is not working. Expecting <%i> item, got <%v>", i, o)
+			t.Errorf("index.GetAll() is not working. Expecting <%d> item, got <%v>", i, o)
 		}
 		i--
 	}

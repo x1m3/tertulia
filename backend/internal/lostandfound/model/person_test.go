@@ -42,7 +42,7 @@ func TestAddTopicsToPerson(t *testing.T) {
 
 	topics := p.Topics()
 	if len(topics) != 1000 {
-		t.Error("Bad topics count related to Person. Expecting <1000>, got <%d>", len(topics))
+		t.Errorf("Bad topics count related to Person. Expecting <1000>, got <%d>", len(topics))
 	}
 
 	for i := 0; i < 1000; i++ {
@@ -51,13 +51,13 @@ func TestAddTopicsToPerson(t *testing.T) {
 		author := topics[i].Author()
 
 		if title != "Title"+strconv.Itoa(i) {
-			t.Error("Bad topics title related to Person. Expecting <%s>, got <%s>", "Title"+strconv.Itoa(i), title)
+			t.Errorf("Bad topics title related to Person. Expecting <%s>, got <%s>", "Title"+strconv.Itoa(i), title)
 		}
 		if body != "Body"+strconv.Itoa(i) {
-			t.Error("Bad topics body related to Person. Expecting <%s>, got <%s>", "Body"+strconv.Itoa(i), body)
+			t.Errorf("Bad topics body related to Person. Expecting <%s>, got <%s>", "Body"+strconv.Itoa(i), body)
 		}
 		if p != author {
-			t.Error("Bad topics author related to Person. Expecting <%s>, got <%s>", p.Nickname(), author.Nickname())
+			t.Errorf("Bad topics author related to Person. Expecting <%s>, got <%s>", p.Nickname(), author.Nickname())
 		}
 	}
 }
