@@ -2,11 +2,12 @@ package zstrings
 
 import (
 	"bytes"
+	"compress/gzip"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"sync"
-	"compress/gzip"
-	"github.com/Sirupsen/logrus"
 )
+
 // A pool of Gzip Writers. Creating a Gzip Writer is expensive so we will reuse the existing ones
 // letting the GC to remove it when needed.
 var zStringGzipWritersPool = sync.Pool{New: func() interface{} {
@@ -40,7 +41,7 @@ type ZString struct {
 // NewZstring creates a new ZString uncompressed. Almost as fast as a usual string, suitable for small and
 // medium string sizes.
 func NewZString(string string) *ZString {
-	return &ZString{compressed:false, value:[]byte(string)}
+	return &ZString{compressed: false, value: []byte(string)}
 }
 
 // NewZStringCompressed created a new ZString that stores the value in compressed format.
@@ -59,7 +60,7 @@ func NewZStringCompressed(string string) *ZString {
 	w.Write([]byte(string))
 	w.Flush()
 	zStringGzipWritersPool.Put(w)
-	return &ZString{compressed:true, value:buff.Bytes()}
+	return &ZString{compressed: true, value: buff.Bytes()}
 }
 
 // Returns the value of a string, whether it is compressed or not.
