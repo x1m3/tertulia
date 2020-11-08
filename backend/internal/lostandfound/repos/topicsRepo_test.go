@@ -107,7 +107,7 @@ func TestTopicsRepo(t *testing.T) {
 		t.Error(err)
 	}
 	if storedTopic.Title != "lala" {
-		t.Error("Fail updating topic title. Expecting <lala>, got <%s>", storedTopic.Title)
+		t.Errorf("Fail updating topic title. Expecting <lala>, got <%s>", storedTopic.Title)
 	}
 
 	// Let's remove all topics
@@ -159,7 +159,7 @@ func TestTopicsRepoAll(t *testing.T) {
 	}
 
 	if count != len(topics.GetByCreatedDateDesc(0, 0)) {
-		t.Error("Expecting <%d> elements when getting all. Got <%d>", len(topics.GetByCreatedDateDesc(0, 0)), count)
+		t.Errorf("Expecting <%d> elements when getting all. Got <%d>", len(topics.GetByCreatedDateDesc(0, 0)), count)
 	}
 }
 
