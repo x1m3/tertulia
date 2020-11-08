@@ -1,18 +1,17 @@
 package index
 
 import (
-	"sync"
-	"github.com/x1m3/Tertulia/utils/uniqueIndex"
-	"github.com/google/btree"
 	"fmt"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/google/btree"
+	"github.com/x1m3/Tertulia/internal/lostandfound/utils/uniqueIndex"
+	"sync"
 )
 
 type IdxItem struct {
-	index uniqueIndex.IdxItem
+	index  uniqueIndex.IdxItem
 	values IdxItemList
 }
-
 
 func (i IdxItem) Less(than btree.Item) bool {
 	fmt.Println("En el primer less")
@@ -27,9 +26,8 @@ type Index struct {
 
 type IdxItemList []uniqueIndex.IdxItem
 
-
-func New(degree int) *Index{
-	return &Index{index:uniqueIndex.New(degree)}
+func New(degree int) *Index {
+	return &Index{index: uniqueIndex.New(degree)}
 }
 
 func (i *Index) Insert(item uniqueIndex.IdxItem) *IdxItem {
@@ -39,7 +37,7 @@ func (i *Index) Insert(item uniqueIndex.IdxItem) *IdxItem {
 	fmt.Println("lala1")
 	previous := i.index.Get(item)
 	fmt.Println("lala2")
-	if previous!=nil {
+	if previous != nil {
 		fmt.Println("lala3")
 		newItem := previous.(IdxItem)
 		newItem.values = append(newItem.values, item)
@@ -47,7 +45,7 @@ func (i *Index) Insert(item uniqueIndex.IdxItem) *IdxItem {
 
 	} else {
 		fmt.Println("lala4")
-		newItem := IdxItem{index:item}
+		newItem := IdxItem{index: item}
 		newItem.values = append(newItem.values, item)
 		i.index.ReplaceOrInsert(newItem)
 	}

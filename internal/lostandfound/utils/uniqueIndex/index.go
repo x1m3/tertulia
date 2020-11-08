@@ -8,7 +8,7 @@ import (
 // A thread safe wrapper for the github.com/google/btree implementation
 type Index struct {
 	sync.RWMutex
-	tree  *btree.BTree
+	tree *btree.BTree
 }
 
 type IdxItem btree.Item
@@ -16,27 +16,27 @@ type IdxItem btree.Item
 type IdxItemList []IdxItem
 
 func (i IdxItemList) From(pos int) IdxItemList {
-	if pos>=0 && len(i)>pos {
+	if pos >= 0 && len(i) > pos {
 		return i[pos:]
-	}else {
+	} else {
 		return nil
 	}
 }
 
 func (i IdxItemList) Limit(lim int) IdxItemList {
-	if lim<=0 {
+	if lim <= 0 {
 		return nil
 	}
-	if len(i)<lim {
+	if len(i) < lim {
 		lim = len(i)
 	}
 	r := make(IdxItemList, lim)
-	_ = copy(r,i[:lim])
+	_ = copy(r, i[:lim])
 	return r
 }
 
 func New(degree int) *Index {
-	return &Index{tree:btree.New(degree)}
+	return &Index{tree: btree.New(degree)}
 }
 
 func (i *Index) ReplaceOrInsert(item IdxItem) IdxItem {
@@ -85,7 +85,7 @@ func (i *Index) Min() IdxItem {
 func (i *Index) AllAsc() IdxItemList {
 	i.RLock()
 	defer i.RUnlock()
-	all := make([]IdxItem,0, i.tree.Len())
+	all := make([]IdxItem, 0, i.tree.Len())
 	i.tree.Ascend(func(a btree.Item) bool {
 		all = append(all, a)
 		return true
@@ -96,7 +96,7 @@ func (i *Index) AllAsc() IdxItemList {
 func (i *Index) AllDesc() IdxItemList {
 	i.RLock()
 	defer i.RUnlock()
-	all := make([]IdxItem,0, i.tree.Len())
+	all := make([]IdxItem, 0, i.tree.Len())
 	i.tree.Descend(func(a btree.Item) bool {
 		all = append(all, a)
 		return true
