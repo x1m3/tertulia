@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	ulid "github.com/x1m3/Tertulia/backend/pkg/id"
 	"time"
 )
 
@@ -13,17 +14,17 @@ type newPostRequest struct {
 	Password      string
 	Title         string
 	Content       string
-	Author        int
+	Author        ulid.ID
 	Excerpt       string
-	FeaturedMedia int
+	FeaturedMedia ulid.ID
 	CommentStatus string
 	PingStatus    string
 	Format        string
 	Meta          string
 	Sticky        bool
 	Template      string
-	Categories    []int
-	Tags          []int
+	Categories    []ulid.ID
+	Tags          []ulid.ID
 }
 
 func NewPost(ctx *gin.Context) (resp interface{}, err error) {
@@ -31,5 +32,5 @@ func NewPost(ctx *gin.Context) (resp interface{}, err error) {
 	if err := ctx.ShouldBind(&req); err != nil {
 		return nil, err
 	}
-	return &PostResponse{}, nil
+	return &PostResponse{ID: ulid.New()}, nil
 }

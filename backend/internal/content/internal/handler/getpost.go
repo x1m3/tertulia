@@ -1,9 +1,12 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	ulid "github.com/x1m3/Tertulia/backend/pkg/id"
+)
 
 type getPostRequest struct {
-	ID       int
+	ID       ulid.ID
 	Context  string
 	Password string
 }
@@ -13,5 +16,5 @@ func GetPost(ctx *gin.Context) (resp interface{}, err error) {
 	if err := ctx.Bind(&req); err != nil {
 		return nil, err
 	}
-	return &PostResponse{}, nil
+	return &PostResponse{ID: ulid.New()}, nil
 }

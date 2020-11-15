@@ -1,12 +1,15 @@
 package handler
 
-import "time"
+import (
+	ulid "github.com/x1m3/Tertulia/backend/pkg/id"
+	"time"
+)
 
 type PostResponse struct {
 	Date              time.Time
 	DateGMT           time.Time
-	GUID              string
-	ID                string
+	GUID              ulid.ID
+	ID                ulid.ID
 	Link              string
 	Modified          time.Time
 	ModifiedGMT       time.Time
@@ -18,15 +21,15 @@ type PostResponse struct {
 	GeneratedSlug     string
 	Title             string
 	Content           string
-	Author            int
+	Author            ulid.ID
 	Excerpt           string
-	FeaturedMedia     int
+	FeaturedMedia     ulid.ID
 	CommentStatus     string
 	PingStatus        string
 	Format            string
 	Meta              string
 	Sticky            bool
 	Template          string
-	Categories        []int
-	Tags              []int
+	Categories        []ulid.ID
+	Tags              []ulid.ID
 }
