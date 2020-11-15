@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"github.com/x1m3/Tertulia/backend/internal/auth"
+	"github.com/x1m3/Tertulia/backend/internal/content"
+	"github.com/x1m3/Tertulia/backend/internal/server"
 	"github.com/x1m3/Tertulia/backend/pkg/pubsub"
 	"github.com/x1m3/Tertulia/backend/pkg/service"
-
-	"github.com/x1m3/Tertulia/backend/internal/server"
 	"math/rand"
 
 	"os"
@@ -33,7 +34,12 @@ func main() {
 	// Creating and starting and http server for public api
 	logrus.WithFields(logrus.Fields{"port": httpPort}).Info("Tertulia started")
 	apiServer := server.NewHTTPd(httpPort)
-	//apiServer.RegisterEndpoints(endpoint.Public()...)
+
+	// Registering http endpoints
+	apiServer.RegisterEndpoints(content.Handlers()...)
+	apiServer.RegisterEndpoints(auth.Handlers()...)
+
+	// Starting server
 	go apiServer.ListenAndServe(ctx)
 
 	// Waiting for an OS signal cancellation
