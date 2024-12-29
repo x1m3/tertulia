@@ -1,0 +1,117 @@
+openapi: 3.0.0
+info:
+  title: Tertulia API
+  version: 1.0.0
+  description: Tertulia API
+
+tags:
+  - name: Operational
+    description: Operational functionalities related to server, etc..
+
+paths:
+  /health:
+    get:
+      operationId: HealthCheck
+      tags:
+        - Operational
+      summary: Health check
+      responses:
+        '200':
+          description: API is up and running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Health:
+      type: object
+      required:
+        - http
+      properties:
+        http:
+          type: boolean
+          example: true
+      example:
+        healthy: true
+
+    GenericErrorMessage:
+      type: object
+      required:
+        - code
+        - err
+        - errHuman
+      properties:
+        code:
+          type: integer
+          example: 400
+        err:
+          type: string
+          example: 'Something happen'
+        errHuman:
+          type: string
+          example: 'This is the explanation of the error'
+
+  responses:
+    '400-BadRequest':
+      description: 'Bad Request'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorMessage'
+
+    '401-Unauthorized':
+      description: 'Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorMessage'
+
+    '402-PaymentRequired':
+      description: 'Payment Required'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorMessage'
+
+    '403-Forbidden':
+      description: 'Forbidden. Authentication failed'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorMessage'
+
+    '404-NotFound':
+      description: 'Not found'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorMessage'
+
+    '409-Conflit':
+      description: 'Conflict'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorMessage'
+
+    '422-UnprocessableEntity':
+      description: 'Unprocessable Entity'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorMessage'
+
+    '500-InternalServerError':
+      description: 'Internal Server error'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorMessage'
