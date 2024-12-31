@@ -22,7 +22,6 @@ import (
 const shutdownTimeout = 5 * time.Second
 
 func main() {
-
 	ctx, cancelContext := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancelContext()
 
