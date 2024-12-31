@@ -7,9 +7,13 @@ info:
 tags:
   - name: Operational
     description: Operational functionalities related to server, etc..
+  - name: Topics
+    description: Operations related to topics
+  - name: Comments
+    description: Operations related to comments
 
 paths:
-  /health:
+  /v1/health:
     get:
       operationId: HealthCheck
       tags:
@@ -22,6 +26,289 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Health'
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+
+  /v1/topics:
+    get:
+      operationId: ListTopics
+      tags:
+        - Topics
+      summary: List all topics
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: A list of topics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTopics'
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+    post:
+      operationId: CreateTopic
+      tags:
+        - Topics
+      summary: Create a new topic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTopic'
+      responses:
+        '201':
+          description: Topic created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Topic'
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+
+  /v1/topics/{topicId}:
+    get:
+      operationId: GetTopic
+      tags:
+        - Topics
+      summary: Get a topic by ID
+      parameters:
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A topic
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Topic'
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+    put:
+      operationId: UpdateTopic
+      tags:
+        - Topics
+      summary: Update a topic by ID
+      parameters:
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Topic'
+      responses:
+        '200':
+          description: Topic updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Topic'
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+    delete:
+      operationId: DeleteTopic
+      tags:
+        - Topics
+      summary: Delete a topic by ID
+      parameters:
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Topic deleted
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+
+  /v1/topics/{topicId}/comments:
+    get:
+      operationId: ListComments
+      tags:
+        - Comments
+      summary: List all comments for a topic
+      parameters:
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: A list of comments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedComments'
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+    post:
+      operationId: CreateComment
+      tags:
+        - Comments
+      summary: Create a new comment for a topic
+      parameters:
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewComment'
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+
+  /v1/comments/{commentId}:
+    get:
+      operationId: GetComment
+      tags:
+        - Comments
+      summary: Get a comment by ID
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+    put:
+      operationId: UpdateComment
+      tags:
+        - Comments
+      summary: Update a comment by ID
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        '200':
+          description: Comment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+    delete:
+      operationId: DeleteComment
+      tags:
+        - Comments
+      summary: Delete a comment by ID
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Comment deleted
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '401':
+          $ref: '#/components/responses/401-Unauthorized'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
 
 components:
   securitySchemes:
@@ -58,6 +345,136 @@ components:
         errHuman:
           type: string
           example: 'This is the explanation of the error'
+
+    PaginatedTopics:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Topic'
+        totalItems:
+          type: integer
+        currentPage:
+          type: integer
+        pageSize:
+          type: integer
+
+    PaginatedComments:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        totalItems:
+          type: integer
+        currentPage:
+          type: integer
+        pageSize:
+          type: integer
+
+    Topic:
+      type: object
+      required:
+        - id
+        - title
+        - summary
+        - authorId
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        url:
+          type: string
+          nullable: true
+        image:
+          type: string
+          nullable: true
+        video:
+          type: string
+          nullable: true
+        authorId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    NewTopic:
+      type: object
+      required:
+        - title
+        - summary
+        - authorId
+      properties:
+        title:
+          type: string
+        summary:
+          type: string
+        url:
+          type: string
+          nullable: true
+        image:
+          type: string
+          nullable: true
+        video:
+          type: string
+          nullable: true
+        authorId:
+          type: string
+
+    Comment:
+      type: object
+      required:
+        - id
+        - content
+        - authorId
+        - topicId
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        authorId:
+          type: string
+        topicId:
+          type: string
+        parentCommentId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    NewComment:
+      type: object
+      required:
+        - content
+        - authorId
+        - topicId
+      properties:
+        content:
+          type: string
+        authorId:
+          type: string
+        topicId:
+          type: string
+        parentCommentId:
+          type: string
+          nullable: true
 
   responses:
     '400-BadRequest':

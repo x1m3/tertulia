@@ -8,30 +8,220 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/oapi-codegen/runtime"
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
+
+// Comment defines model for Comment.
+type Comment struct {
+	AuthorId        string    `json:"authorId"`
+	Content         string    `json:"content"`
+	CreatedAt       time.Time `json:"createdAt"`
+	Id              string    `json:"id"`
+	ParentCommentId *string   `json:"parentCommentId"`
+	TopicId         string    `json:"topicId"`
+	UpdatedAt       time.Time `json:"updatedAt"`
+}
+
+// GenericErrorMessage defines model for GenericErrorMessage.
+type GenericErrorMessage struct {
+	Code     int    `json:"code"`
+	Err      string `json:"err"`
+	ErrHuman string `json:"errHuman"`
+}
 
 // Health defines model for Health.
 type Health struct {
 	Http bool `json:"http"`
 }
 
+// NewComment defines model for NewComment.
+type NewComment struct {
+	AuthorId        string  `json:"authorId"`
+	Content         string  `json:"content"`
+	ParentCommentId *string `json:"parentCommentId"`
+	TopicId         string  `json:"topicId"`
+}
+
+// NewTopic defines model for NewTopic.
+type NewTopic struct {
+	AuthorId string  `json:"authorId"`
+	Image    *string `json:"image"`
+	Summary  string  `json:"summary"`
+	Title    string  `json:"title"`
+	Url      *string `json:"url"`
+	Video    *string `json:"video"`
+}
+
+// PaginatedComments defines model for PaginatedComments.
+type PaginatedComments struct {
+	CurrentPage *int       `json:"currentPage,omitempty"`
+	Items       *[]Comment `json:"items,omitempty"`
+	PageSize    *int       `json:"pageSize,omitempty"`
+	TotalItems  *int       `json:"totalItems,omitempty"`
+}
+
+// PaginatedTopics defines model for PaginatedTopics.
+type PaginatedTopics struct {
+	CurrentPage *int     `json:"currentPage,omitempty"`
+	Items       *[]Topic `json:"items,omitempty"`
+	PageSize    *int     `json:"pageSize,omitempty"`
+	TotalItems  *int     `json:"totalItems,omitempty"`
+}
+
+// Topic defines model for Topic.
+type Topic struct {
+	AuthorId  string    `json:"authorId"`
+	CreatedAt time.Time `json:"createdAt"`
+	Id        string    `json:"id"`
+	Image     *string   `json:"image"`
+	Summary   string    `json:"summary"`
+	Title     string    `json:"title"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	Url       *string   `json:"url"`
+	Video     *string   `json:"video"`
+}
+
+// N400BadRequest defines model for 400-BadRequest.
+type N400BadRequest = GenericErrorMessage
+
+// N401Unauthorized defines model for 401-Unauthorized.
+type N401Unauthorized = GenericErrorMessage
+
+// N500InternalServerError defines model for 500-InternalServerError.
+type N500InternalServerError = GenericErrorMessage
+
+// ListTopicsParams defines parameters for ListTopics.
+type ListTopicsParams struct {
+	Page     *int `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *int `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+}
+
+// ListCommentsParams defines parameters for ListComments.
+type ListCommentsParams struct {
+	Page     *int `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *int `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+}
+
+// UpdateCommentJSONRequestBody defines body for UpdateComment for application/json ContentType.
+type UpdateCommentJSONRequestBody = Comment
+
+// CreateTopicJSONRequestBody defines body for CreateTopic for application/json ContentType.
+type CreateTopicJSONRequestBody = NewTopic
+
+// UpdateTopicJSONRequestBody defines body for UpdateTopic for application/json ContentType.
+type UpdateTopicJSONRequestBody = Topic
+
+// CreateCommentJSONRequestBody defines body for CreateComment for application/json ContentType.
+type CreateCommentJSONRequestBody = NewComment
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Delete a comment by ID
+	// (DELETE /v1/comments/{commentId})
+	DeleteComment(w http.ResponseWriter, r *http.Request, commentId string)
+	// Get a comment by ID
+	// (GET /v1/comments/{commentId})
+	GetComment(w http.ResponseWriter, r *http.Request, commentId string)
+	// Update a comment by ID
+	// (PUT /v1/comments/{commentId})
+	UpdateComment(w http.ResponseWriter, r *http.Request, commentId string)
 	// Health check
-	// (GET /health)
+	// (GET /v1/health)
 	HealthCheck(w http.ResponseWriter, r *http.Request)
+	// List all topics
+	// (GET /v1/topics)
+	ListTopics(w http.ResponseWriter, r *http.Request, params ListTopicsParams)
+	// Create a new topic
+	// (POST /v1/topics)
+	CreateTopic(w http.ResponseWriter, r *http.Request)
+	// Delete a topic by ID
+	// (DELETE /v1/topics/{topicId})
+	DeleteTopic(w http.ResponseWriter, r *http.Request, topicId string)
+	// Get a topic by ID
+	// (GET /v1/topics/{topicId})
+	GetTopic(w http.ResponseWriter, r *http.Request, topicId string)
+	// Update a topic by ID
+	// (PUT /v1/topics/{topicId})
+	UpdateTopic(w http.ResponseWriter, r *http.Request, topicId string)
+	// List all comments for a topic
+	// (GET /v1/topics/{topicId}/comments)
+	ListComments(w http.ResponseWriter, r *http.Request, topicId string, params ListCommentsParams)
+	// Create a new comment for a topic
+	// (POST /v1/topics/{topicId}/comments)
+	CreateComment(w http.ResponseWriter, r *http.Request, topicId string)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
 
+// Delete a comment by ID
+// (DELETE /v1/comments/{commentId})
+func (_ Unimplemented) DeleteComment(w http.ResponseWriter, r *http.Request, commentId string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get a comment by ID
+// (GET /v1/comments/{commentId})
+func (_ Unimplemented) GetComment(w http.ResponseWriter, r *http.Request, commentId string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Update a comment by ID
+// (PUT /v1/comments/{commentId})
+func (_ Unimplemented) UpdateComment(w http.ResponseWriter, r *http.Request, commentId string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // Health check
-// (GET /health)
+// (GET /v1/health)
 func (_ Unimplemented) HealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// List all topics
+// (GET /v1/topics)
+func (_ Unimplemented) ListTopics(w http.ResponseWriter, r *http.Request, params ListTopicsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Create a new topic
+// (POST /v1/topics)
+func (_ Unimplemented) CreateTopic(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Delete a topic by ID
+// (DELETE /v1/topics/{topicId})
+func (_ Unimplemented) DeleteTopic(w http.ResponseWriter, r *http.Request, topicId string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get a topic by ID
+// (GET /v1/topics/{topicId})
+func (_ Unimplemented) GetTopic(w http.ResponseWriter, r *http.Request, topicId string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Update a topic by ID
+// (PUT /v1/topics/{topicId})
+func (_ Unimplemented) UpdateTopic(w http.ResponseWriter, r *http.Request, topicId string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// List all comments for a topic
+// (GET /v1/topics/{topicId}/comments)
+func (_ Unimplemented) ListComments(w http.ResponseWriter, r *http.Request, topicId string, params ListCommentsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Create a new comment for a topic
+// (POST /v1/topics/{topicId}/comments)
+func (_ Unimplemented) CreateComment(w http.ResponseWriter, r *http.Request, topicId string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -44,11 +234,279 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
+// DeleteComment operation middleware
+func (siw *ServerInterfaceWrapper) DeleteComment(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "commentId" -------------
+	var commentId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "commentId", chi.URLParam(r, "commentId"), &commentId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "commentId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteComment(w, r, commentId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetComment operation middleware
+func (siw *ServerInterfaceWrapper) GetComment(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "commentId" -------------
+	var commentId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "commentId", chi.URLParam(r, "commentId"), &commentId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "commentId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetComment(w, r, commentId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateComment operation middleware
+func (siw *ServerInterfaceWrapper) UpdateComment(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "commentId" -------------
+	var commentId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "commentId", chi.URLParam(r, "commentId"), &commentId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "commentId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateComment(w, r, commentId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // HealthCheck operation middleware
 func (siw *ServerInterfaceWrapper) HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.HealthCheck(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListTopics operation middleware
+func (siw *ServerInterfaceWrapper) ListTopics(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListTopicsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "pageSize", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListTopics(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateTopic operation middleware
+func (siw *ServerInterfaceWrapper) CreateTopic(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateTopic(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteTopic operation middleware
+func (siw *ServerInterfaceWrapper) DeleteTopic(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "topicId" -------------
+	var topicId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "topicId", chi.URLParam(r, "topicId"), &topicId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "topicId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteTopic(w, r, topicId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetTopic operation middleware
+func (siw *ServerInterfaceWrapper) GetTopic(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "topicId" -------------
+	var topicId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "topicId", chi.URLParam(r, "topicId"), &topicId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "topicId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetTopic(w, r, topicId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateTopic operation middleware
+func (siw *ServerInterfaceWrapper) UpdateTopic(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "topicId" -------------
+	var topicId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "topicId", chi.URLParam(r, "topicId"), &topicId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "topicId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateTopic(w, r, topicId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListComments operation middleware
+func (siw *ServerInterfaceWrapper) ListComments(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "topicId" -------------
+	var topicId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "topicId", chi.URLParam(r, "topicId"), &topicId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "topicId", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListCommentsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "pageSize", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListComments(w, r, topicId, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateComment operation middleware
+func (siw *ServerInterfaceWrapper) CreateComment(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "topicId" -------------
+	var topicId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "topicId", chi.URLParam(r, "topicId"), &topicId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "topicId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateComment(w, r, topicId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -172,10 +630,184 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/health", wrapper.HealthCheck)
+		r.Delete(options.BaseURL+"/v1/comments/{commentId}", wrapper.DeleteComment)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/v1/comments/{commentId}", wrapper.GetComment)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/v1/comments/{commentId}", wrapper.UpdateComment)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/v1/health", wrapper.HealthCheck)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/v1/topics", wrapper.ListTopics)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/v1/topics", wrapper.CreateTopic)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/v1/topics/{topicId}", wrapper.DeleteTopic)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/v1/topics/{topicId}", wrapper.GetTopic)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/v1/topics/{topicId}", wrapper.UpdateTopic)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/v1/topics/{topicId}/comments", wrapper.ListComments)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/v1/topics/{topicId}/comments", wrapper.CreateComment)
 	})
 
 	return r
+}
+
+type N400BadRequestJSONResponse GenericErrorMessage
+
+type N401UnauthorizedJSONResponse GenericErrorMessage
+
+type N500InternalServerErrorJSONResponse GenericErrorMessage
+
+type DeleteCommentRequestObject struct {
+	CommentId string `json:"commentId"`
+}
+
+type DeleteCommentResponseObject interface {
+	VisitDeleteCommentResponse(w http.ResponseWriter) error
+}
+
+type DeleteComment204Response struct {
+}
+
+func (response DeleteComment204Response) VisitDeleteCommentResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteComment400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response DeleteComment400JSONResponse) VisitDeleteCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteComment401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response DeleteComment401JSONResponse) VisitDeleteCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteComment500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response DeleteComment500JSONResponse) VisitDeleteCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCommentRequestObject struct {
+	CommentId string `json:"commentId"`
+}
+
+type GetCommentResponseObject interface {
+	VisitGetCommentResponse(w http.ResponseWriter) error
+}
+
+type GetComment200JSONResponse Comment
+
+func (response GetComment200JSONResponse) VisitGetCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetComment400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response GetComment400JSONResponse) VisitGetCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetComment401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response GetComment401JSONResponse) VisitGetCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetComment500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response GetComment500JSONResponse) VisitGetCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateCommentRequestObject struct {
+	CommentId string `json:"commentId"`
+	Body      *UpdateCommentJSONRequestBody
+}
+
+type UpdateCommentResponseObject interface {
+	VisitUpdateCommentResponse(w http.ResponseWriter) error
+}
+
+type UpdateComment200JSONResponse Comment
+
+func (response UpdateComment200JSONResponse) VisitUpdateCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateComment400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response UpdateComment400JSONResponse) VisitUpdateCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateComment401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response UpdateComment401JSONResponse) VisitUpdateCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateComment500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response UpdateComment500JSONResponse) VisitUpdateCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type HealthCheckRequestObject struct {
@@ -194,11 +826,394 @@ func (response HealthCheck200JSONResponse) VisitHealthCheckResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
+type HealthCheck400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response HealthCheck400JSONResponse) VisitHealthCheckResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type HealthCheck401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response HealthCheck401JSONResponse) VisitHealthCheckResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type HealthCheck500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response HealthCheck500JSONResponse) VisitHealthCheckResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListTopicsRequestObject struct {
+	Params ListTopicsParams
+}
+
+type ListTopicsResponseObject interface {
+	VisitListTopicsResponse(w http.ResponseWriter) error
+}
+
+type ListTopics200JSONResponse PaginatedTopics
+
+func (response ListTopics200JSONResponse) VisitListTopicsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListTopics400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response ListTopics400JSONResponse) VisitListTopicsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListTopics401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response ListTopics401JSONResponse) VisitListTopicsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListTopics500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response ListTopics500JSONResponse) VisitListTopicsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateTopicRequestObject struct {
+	Body *CreateTopicJSONRequestBody
+}
+
+type CreateTopicResponseObject interface {
+	VisitCreateTopicResponse(w http.ResponseWriter) error
+}
+
+type CreateTopic201JSONResponse Topic
+
+func (response CreateTopic201JSONResponse) VisitCreateTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateTopic400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response CreateTopic400JSONResponse) VisitCreateTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateTopic401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response CreateTopic401JSONResponse) VisitCreateTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateTopic500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response CreateTopic500JSONResponse) VisitCreateTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteTopicRequestObject struct {
+	TopicId string `json:"topicId"`
+}
+
+type DeleteTopicResponseObject interface {
+	VisitDeleteTopicResponse(w http.ResponseWriter) error
+}
+
+type DeleteTopic204Response struct {
+}
+
+func (response DeleteTopic204Response) VisitDeleteTopicResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteTopic400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response DeleteTopic400JSONResponse) VisitDeleteTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteTopic401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response DeleteTopic401JSONResponse) VisitDeleteTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteTopic500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response DeleteTopic500JSONResponse) VisitDeleteTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetTopicRequestObject struct {
+	TopicId string `json:"topicId"`
+}
+
+type GetTopicResponseObject interface {
+	VisitGetTopicResponse(w http.ResponseWriter) error
+}
+
+type GetTopic200JSONResponse Topic
+
+func (response GetTopic200JSONResponse) VisitGetTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetTopic400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response GetTopic400JSONResponse) VisitGetTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetTopic401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response GetTopic401JSONResponse) VisitGetTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetTopic500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response GetTopic500JSONResponse) VisitGetTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateTopicRequestObject struct {
+	TopicId string `json:"topicId"`
+	Body    *UpdateTopicJSONRequestBody
+}
+
+type UpdateTopicResponseObject interface {
+	VisitUpdateTopicResponse(w http.ResponseWriter) error
+}
+
+type UpdateTopic200JSONResponse Topic
+
+func (response UpdateTopic200JSONResponse) VisitUpdateTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateTopic400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response UpdateTopic400JSONResponse) VisitUpdateTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateTopic401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response UpdateTopic401JSONResponse) VisitUpdateTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateTopic500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response UpdateTopic500JSONResponse) VisitUpdateTopicResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListCommentsRequestObject struct {
+	TopicId string `json:"topicId"`
+	Params  ListCommentsParams
+}
+
+type ListCommentsResponseObject interface {
+	VisitListCommentsResponse(w http.ResponseWriter) error
+}
+
+type ListComments200JSONResponse PaginatedComments
+
+func (response ListComments200JSONResponse) VisitListCommentsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListComments400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response ListComments400JSONResponse) VisitListCommentsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListComments401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response ListComments401JSONResponse) VisitListCommentsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListComments500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response ListComments500JSONResponse) VisitListCommentsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateCommentRequestObject struct {
+	TopicId string `json:"topicId"`
+	Body    *CreateCommentJSONRequestBody
+}
+
+type CreateCommentResponseObject interface {
+	VisitCreateCommentResponse(w http.ResponseWriter) error
+}
+
+type CreateComment201JSONResponse Comment
+
+func (response CreateComment201JSONResponse) VisitCreateCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateComment400JSONResponse struct{ N400BadRequestJSONResponse }
+
+func (response CreateComment400JSONResponse) VisitCreateCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateComment401JSONResponse struct{ N401UnauthorizedJSONResponse }
+
+func (response CreateComment401JSONResponse) VisitCreateCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateComment500JSONResponse struct {
+	N500InternalServerErrorJSONResponse
+}
+
+func (response CreateComment500JSONResponse) VisitCreateCommentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// Delete a comment by ID
+	// (DELETE /v1/comments/{commentId})
+	DeleteComment(ctx context.Context, request DeleteCommentRequestObject) (DeleteCommentResponseObject, error)
+	// Get a comment by ID
+	// (GET /v1/comments/{commentId})
+	GetComment(ctx context.Context, request GetCommentRequestObject) (GetCommentResponseObject, error)
+	// Update a comment by ID
+	// (PUT /v1/comments/{commentId})
+	UpdateComment(ctx context.Context, request UpdateCommentRequestObject) (UpdateCommentResponseObject, error)
 	// Health check
-	// (GET /health)
+	// (GET /v1/health)
 	HealthCheck(ctx context.Context, request HealthCheckRequestObject) (HealthCheckResponseObject, error)
+	// List all topics
+	// (GET /v1/topics)
+	ListTopics(ctx context.Context, request ListTopicsRequestObject) (ListTopicsResponseObject, error)
+	// Create a new topic
+	// (POST /v1/topics)
+	CreateTopic(ctx context.Context, request CreateTopicRequestObject) (CreateTopicResponseObject, error)
+	// Delete a topic by ID
+	// (DELETE /v1/topics/{topicId})
+	DeleteTopic(ctx context.Context, request DeleteTopicRequestObject) (DeleteTopicResponseObject, error)
+	// Get a topic by ID
+	// (GET /v1/topics/{topicId})
+	GetTopic(ctx context.Context, request GetTopicRequestObject) (GetTopicResponseObject, error)
+	// Update a topic by ID
+	// (PUT /v1/topics/{topicId})
+	UpdateTopic(ctx context.Context, request UpdateTopicRequestObject) (UpdateTopicResponseObject, error)
+	// List all comments for a topic
+	// (GET /v1/topics/{topicId}/comments)
+	ListComments(ctx context.Context, request ListCommentsRequestObject) (ListCommentsResponseObject, error)
+	// Create a new comment for a topic
+	// (POST /v1/topics/{topicId}/comments)
+	CreateComment(ctx context.Context, request CreateCommentRequestObject) (CreateCommentResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -230,6 +1245,91 @@ type strictHandler struct {
 	options     StrictHTTPServerOptions
 }
 
+// DeleteComment operation middleware
+func (sh *strictHandler) DeleteComment(w http.ResponseWriter, r *http.Request, commentId string) {
+	var request DeleteCommentRequestObject
+
+	request.CommentId = commentId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteComment(ctx, request.(DeleteCommentRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteComment")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteCommentResponseObject); ok {
+		if err := validResponse.VisitDeleteCommentResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetComment operation middleware
+func (sh *strictHandler) GetComment(w http.ResponseWriter, r *http.Request, commentId string) {
+	var request GetCommentRequestObject
+
+	request.CommentId = commentId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetComment(ctx, request.(GetCommentRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetComment")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCommentResponseObject); ok {
+		if err := validResponse.VisitGetCommentResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateComment operation middleware
+func (sh *strictHandler) UpdateComment(w http.ResponseWriter, r *http.Request, commentId string) {
+	var request UpdateCommentRequestObject
+
+	request.CommentId = commentId
+
+	var body UpdateCommentJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateComment(ctx, request.(UpdateCommentRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateComment")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateCommentResponseObject); ok {
+		if err := validResponse.VisitUpdateCommentResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // HealthCheck operation middleware
 func (sh *strictHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	var request HealthCheckRequestObject
@@ -247,6 +1347,208 @@ func (sh *strictHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(HealthCheckResponseObject); ok {
 		if err := validResponse.VisitHealthCheckResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListTopics operation middleware
+func (sh *strictHandler) ListTopics(w http.ResponseWriter, r *http.Request, params ListTopicsParams) {
+	var request ListTopicsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListTopics(ctx, request.(ListTopicsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListTopics")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListTopicsResponseObject); ok {
+		if err := validResponse.VisitListTopicsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateTopic operation middleware
+func (sh *strictHandler) CreateTopic(w http.ResponseWriter, r *http.Request) {
+	var request CreateTopicRequestObject
+
+	var body CreateTopicJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateTopic(ctx, request.(CreateTopicRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateTopic")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateTopicResponseObject); ok {
+		if err := validResponse.VisitCreateTopicResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteTopic operation middleware
+func (sh *strictHandler) DeleteTopic(w http.ResponseWriter, r *http.Request, topicId string) {
+	var request DeleteTopicRequestObject
+
+	request.TopicId = topicId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteTopic(ctx, request.(DeleteTopicRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteTopic")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteTopicResponseObject); ok {
+		if err := validResponse.VisitDeleteTopicResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetTopic operation middleware
+func (sh *strictHandler) GetTopic(w http.ResponseWriter, r *http.Request, topicId string) {
+	var request GetTopicRequestObject
+
+	request.TopicId = topicId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetTopic(ctx, request.(GetTopicRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetTopic")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetTopicResponseObject); ok {
+		if err := validResponse.VisitGetTopicResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateTopic operation middleware
+func (sh *strictHandler) UpdateTopic(w http.ResponseWriter, r *http.Request, topicId string) {
+	var request UpdateTopicRequestObject
+
+	request.TopicId = topicId
+
+	var body UpdateTopicJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateTopic(ctx, request.(UpdateTopicRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateTopic")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateTopicResponseObject); ok {
+		if err := validResponse.VisitUpdateTopicResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListComments operation middleware
+func (sh *strictHandler) ListComments(w http.ResponseWriter, r *http.Request, topicId string, params ListCommentsParams) {
+	var request ListCommentsRequestObject
+
+	request.TopicId = topicId
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListComments(ctx, request.(ListCommentsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListComments")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListCommentsResponseObject); ok {
+		if err := validResponse.VisitListCommentsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateComment operation middleware
+func (sh *strictHandler) CreateComment(w http.ResponseWriter, r *http.Request, topicId string) {
+	var request CreateCommentRequestObject
+
+	request.TopicId = topicId
+
+	var body CreateCommentJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateComment(ctx, request.(CreateCommentRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateComment")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateCommentResponseObject); ok {
+		if err := validResponse.VisitCreateCommentResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
