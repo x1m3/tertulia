@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tertulia-postgres
+    environment:
+      POSTGRES_DB: tertulia
+      POSTGRES_USER: tertulia
+      POSTGRES_PASSWORD: tertulia
+    ports:
+      - "5432:5432"
+    volumes:
+      - tertulia-pgdata:/var/lib/postgresql/data
+
+volumes:
+  tertulia-pgdata:

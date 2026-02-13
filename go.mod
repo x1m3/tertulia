@@ -1,6 +1,6 @@
 module github.com/x1m3/tertulia
 
-go 1.23.1
+go 1.26.0
 
 require (
 	github.com/ThreeDotsLabs/watermill v1.4.1
