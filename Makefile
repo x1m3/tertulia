@@ -71,7 +71,7 @@ $(BIN)/oapi-codegen: tools.go go.mod go.sum
 
 # install golang lint.
 $(BIN)/golangci-lint: go.mod go.sum
-	$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.61
+	$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.2
 
 # install database migration tool. goose
 $(BIN)/goose: go.mod go.sum
